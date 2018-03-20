@@ -347,7 +347,8 @@ class ClientTrader:
 
         self._type_keys(
             self._config.TRADE_PRICE_CONTROL_ID,
-            easyutils.round_price_by_code(price, code)
+            #'{BACKSPACE 7}' + str(price)
+            '{BACKSPACE 7}' + easyutils.round_price_by_code(price, code)
         )
         self._type_keys(
             self._config.TRADE_AMOUNT_CONTROL_ID,
@@ -375,10 +376,26 @@ class ClientTrader:
             control_id=control_id,
             class_name='CVirtualGridCtrl'
         )
-        grid.type_keys('^A^C')
-        return self._format_grid_data(
-            self._get_clipboard_data()
-        )
+        # grid.type_keys('^A^C')
+        # return self._format_grid_data(
+            # self._get_clipboard_data()
+        # )
+        grid.type_keys('^s')
+        self._wait(0.2)
+        """
+        保存为table.xls文件，如果已存在，则替换
+        alt+s保存，alt+y替换已存在的文件
+        """
+        self._app.top_window().type_keys('%{s}%{y}')
+        origination = self._config.DEFAULT_XLS_PATH
+        destination = self._config.DEFAULT_CSV_PATH
+        """
+        将xls文件重命名为csv文件
+        """
+        if os.path.exists(destination):
+            os.remove(destination)
+        os.rename(origination, destination)
+        return self._format_grid_data(destination)
 
     def _type_keys(self, control_id, text):
         self._main.window(
@@ -416,7 +433,9 @@ class ClientTrader:
                 pass
 
     def _format_grid_data(self, data):
-        df = pd.read_csv(io.StringIO(data),
+        # df = pd.read_csv(io.StringIO(data),
+        df = pd.read_csv(data,
+                         encoding='gbk',
                          delimiter='\t',
                          dtype=self._config.GRID_DTYPE,
                          na_filter=False,
