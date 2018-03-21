@@ -40,6 +40,21 @@ class RemoteClient:
             raise Exception(response.json()['error'])
         return response.json()
 
+    def connect(self, exe_path=None, **kwargs):
+        """
+        直接连接登陆后的客户端
+        :param exe_path: 客户端路径类似 r'C:\\htzqzyb2\\xiadan.exe', 默认 r'C:\\htzqzyb2\\xiadan.exe'
+        :return:
+        """
+        params = locals().copy()
+        params.pop('self')
+
+        params['broker'] = self._broker
+        response = self._s.post(self._api + '/connect', json=params)
+        if response.status_code >= 300:
+            raise Exception(response.json()['error'])
+        return response.json()
+
     @property
     def balance(self):
         return self.common_get('balance')

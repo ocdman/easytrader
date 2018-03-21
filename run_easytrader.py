@@ -1,8 +1,6 @@
 # coding: utf-8
 
 import easytrader
-import pandas as pd
-import os
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from pywinauto import Application, win32defines
@@ -33,7 +31,8 @@ def get_connection_status():
         control_id=user._config.STATUS_BAR_CONTROL_ID,
         class_name='msctls_statusbar32'
     )
-    status = statusBar.GetProperties()['texts'][2]
+    #status = statusBar.GetProperties()['texts'][2]
+    status = statusBar.GetPartText(1)
     return status != '断开'
 
 '''
@@ -46,11 +45,12 @@ def try_connection(times):
     if get_connection_status():
         return
     else:
-        set_foreground_window()
+        #set_foreground_window()
         toolbar = user._main.window(
             control_id=user._config.TOOL_BAR_CONTROL_ID
         )
-        toolbar.PressButton(3) #点击刷新按钮
+        #toolbar.PressButton(3) #点击刷新按钮
+        toolbar.Button(3).Click()
         user._wait(5)
     times -= 1
     try_connection(times)
